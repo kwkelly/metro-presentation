@@ -32,7 +32,7 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 						</h1>
 						<div style="color: #FFFFFF; position: absolute; left: 0; text-align: left; padding: 20px">
 							This presentation at: </br>
-							short-link
+							<a href="https://www.kwkelly.com/pres/metro-pres/">kwkelly.com/pres/metro-pres/</a>
 						</div>
 						<div style="color: #FFFFFF; position: absolute; right: 0; padding: 20px">
 							<ul>
@@ -69,53 +69,84 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 				<section class="other-slide">
 					<div class="header">
 						<h2>A Typical Day</h2>
-						<div style="color: #2C3E50; position: absolute; text-align: center; padding: 20px">
+						<div style="color: #2C3E50; position: absolute; text-align: left; padding: 20px">
 							<span class="fragment fade-in">
 								<p>You're on your way to work, heading home, or going to meet some friends...</p>
 							</span>
 							<span class="fragment fade-in">
 								<p>... and you walk into the station and see this: </p>
-								<img src="pid.jpg" style="width: auto; height: 50%;"></img>
 							</span>
 							<span class="fragment fade-in">
-								<p>This means that you're going to be waiting 10 minutes for your train</p>
+								<img class="center" src="pid.jpg" style="width: auto; height: auto;"></img>
 							</span>
 						</div>
 					</div>
 				</section>
 				<section class="other-slide">
 					<div class="header">
-						<h2>A Typical Day</h2>
+						<h2>Waiting for <strike>Godot</strike> Metro</h2>
 						<div style="color: #2C3E50; padding: 20px; text-align: left;">
-							<p>Is this really typical??</p>
-							<p>To find out if 10 minutes is a typical wait time, let's find out what the data tell us.</p>
+							<h3>Fact:</h3>
+							<ul>
+								<li>Riders hate waiting for trains; waiting time is regarded as wasted time.</li>
+							</ul>
+							<h3>Questions:</h3>
+							<ul>
+								<li>So how long do Metrorail riders typically wait for their trains?</li>
+								<li>How can we figure out how long riders wait?</li>
+							</ul>
 						</div>
 					</div>
 				</section>
-					<section>
-						<section class="other-slide">
-							<div class="header">
-								<h2>Estimating Wait Times</h2>
-								<div style="color: #2C3E50; padding: 20px; text-align: left;">
-									<p>So how are wait times estimated?</p>
-									<p>We start with the </p>
-									<p>$$W(t) = \frac{\int_t^{\infty} H(s)ds}{\int_0^{\infty}sH(s)ds}$$</p>
-									<p></p>
-								</div>
-							</div>
-						</section>
-						<section class="other-slide">
-							<div class="header">
-								<h2>Estimating Wait Times</h2>
-								<div style="color: #2C3E50; padding: 20px; text-align: left;">
-									<p>So how are wait times estimated?</p>
-									<p>We start with the </p>
-									<p>$$W(t) = \frac{\int_t^{\infty} H(s)ds}{\int_0^{\infty}sH(s)ds}$$</p>
-									<p></p>
-								</div>
-							</div>
-						</section>
-					</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Analysis Map</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: center;">
+							Train Positions &rarr; Train Headways &rarr; Passenger Waiting Times
+								<img class="center imrotate" src="orange.png" style="width: auto; height: auto;"></img>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Train Positions</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: left;">
+							<ul>
+								<li>Old rail predictions API <i class="fa fa-thumbs-down" aria-hidden="true"></i></li>
+									<ul>
+										<li>Tough to reliably determine if it's a new train at a station</li>
+									</ul>
+								<li>Newer train positions API <i class="fa fa-thumbs-up" aria-hidden="true"></i></li>
+									<ul>
+										<li>CircuitId &larr; Standard Routes API to determine if circuit is at a station</li>
+										<li>DestinationStationCode</li>
+										<li>DirectionNum</li>
+										<li>LineCode</li>
+										<li>TrainId</li>
+									</ul>
+							</ul>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Getting Headways</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: left;">
+							<p>Given the train position data and the time of the query</p>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Estimating Wait Times</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: left;">
+							<p>So how are wait times estimated?</p>
+							<p>We start with the </p>
+							<p>$$w(t) = \frac{\int_t^{\infty} h(s)ds}{\int_0^{\infty}s\,h(s)ds}$$</p>
+							<p></p>
+						</div>
+					</div>
+				</section>
 					</div>
 			</div>
 
