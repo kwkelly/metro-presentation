@@ -84,16 +84,15 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 				</section>
 				<section class="other-slide">
 					<div class="header">
-						<h2>Waiting for <strike>Godot</strike> Metro</h2>
+						<h2>Waiting for WMATA</h2>
 						<div style="color: #2C3E50; padding: 20px; text-align: left;">
 							<h3>Fact:</h3>
 							<ul>
 								<li>Riders hate waiting for trains; waiting time is regarded as wasted time.</li>
 							</ul>
-							<h3>Questions:</h3>
+							<h3>Question:</h3>
 							<ul>
-								<li>So how long do Metrorail riders typically wait for their trains?</li>
-								<li>How can we figure out how long riders wait?</li>
+								<li>How long do Metrorail riders typically wait for their trains?</li>
 							</ul>
 						</div>
 					</div>
@@ -132,7 +131,48 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 					<div class="header">
 						<h2>Getting Headways</h2>
 						<div style="color: #2C3E50; padding: 20px; text-align: left;">
-							<p>Given the train position data and the time of the query</p>
+							<h3>Position data + route data + query time <i class="fa fa-long-arrow-right" aria-hidden="true"></i>
+ headways</h3>
+									<ul>
+										<li>Keep data in chronological order</li>
+										<li>Simply ignore all position data where a train is not at a station</li>
+										<li>Then for a given station, line, and direction, compute the time difference between each row of data</li>
+									</ul>
+									<pre><code data-trim>
+# df = all data
+df = df[df['StationCode'] == station]
+df = df[df['LineCode'] == line_code]
+df = df[df['DirectionNum'] == dir_num]
+head = np.diff(df['DateTime'])
+									</code></pre>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Getting Headways</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: center;">
+<div class="container-fluid">
+<div class="row">
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/BL_headways.png" onclick="changeHead(this);">BL</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/GR_headways.png" onclick="changeHead(this);">GR</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/RD_headways.png" onclick="changeHead(this);">RD</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/OR_headways.png" onclick="changeHead(this);">OR</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/YL_headways.png" onclick="changeHead(this);">YL</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/SV_headways.png" onclick="changeHead(this);">SV</button>
+<div class="col-md-12 thumb">
+<img id="head-plot" class="img-responsive center-block plots" src="images/BL_headways.png"></img>
+
+</div>
+</div>
+
+<script type="text/javascript">
+function changeHead(element){
+var head_link = element.getAttribute("src");
+document.getElementById("head-plot").src = head_link
+}
+</script>
+
 						</div>
 					</div>
 				</section>
@@ -140,10 +180,109 @@ document.getElementsByTagName( 'head' )[0].appendChild( link );
 					<div class="header">
 						<h2>Estimating Wait Times</h2>
 						<div style="color: #2C3E50; padding: 20px; text-align: left;">
-							<p>So how are wait times estimated?</p>
-							<p>We start with the </p>
-							<p>$$w(t) = \frac{\int_t^{\infty} h(s)ds}{\int_0^{\infty}s\,h(s)ds}$$</p>
-							<p></p>
+								<ul>
+									<li>Headways are about trains, waiting is about people</li>
+									<li>We have data about trains, but not people</li>
+								</ul>
+							<span class="fragment fade-in">
+								<h4>Assumptions</h4>
+								<ul>
+									<li>No strategic behavior of passengers w.r.t. common lines</li>
+									<li>No congestion phenomena</li>
+									<li>Passenger arrivals are uniformly distributed</li>
+								</ul>
+								</span>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Estimating Wait Times</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: left;">
+							<p>
+							Since passenger arrivals are assumed to be uniformly distributed, the probability of waiting an amount of time $t$ is proportional to the probability of a headway greater than $t$.
+							<img class="erlang" src="erlang.png"></img>
+							</p>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Estimating Wait Times</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: left;">
+							Let $h(t)$ be the distribution of headways.
+							Then wait times $w(t)$ can be computed as
+							$$w(t) \propto \int_t^{\infty} h(s)\,ds = \bar{H}(t)$$
+							Finding the constant of proportionality is of course just normalizing the distribution, so that
+							$$w(t) = \frac{\int_t^{\infty} h(s)\,ds}{\int_0^{\infty} \bar{H}(s) \,ds} = \frac{\int_t^{\infty} h(s)\,ds}{\int_0^{\infty} s\,h(s) \,ds}$$
+							But we really don't care about the constant, just the proportion becuase we are using a computer and can normalize after the fact.
+							<!--http://math.stackexchange.com/questions/172841/integral-of-cdf-equals-expected-value -->
+							<!--Modelling Public Transport Passenger Flows in the Era of Intelligent Transport Systems 322 on-->
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Estimating Wait Times</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: center;">
+							In practice though, we just sample from the headway distribution.
+									<pre><code data-trim>
+# diffs = all headways for a single line
+waits = itertools.chain(*[np.arange(0, diff, 0.5).tolist() for diff in diffs])
+									</code></pre>
+								<img class="img-responsive center-block plots" src="sample.png"></img>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Estimating Wait Times</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: center;">
+<div class="container-fluid">
+<div class="row">
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/BL_wait_times.png" onclick="changeWait(this);">BL</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/GR_wait_times.png" onclick="changeWait(this);">GR</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/RD_wait_times.png" onclick="changeWait(this);">RD</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/OR_wait_times.png" onclick="changeWait(this);">OR</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/YL_wait_times.png" onclick="changeWait(this);">YL</button>
+<button type="button" class="btn btn-primary btn-sm string-button" src="images/SV_wait_times.png" onclick="changeWait(this);">SV</button>
+<div class="col-md-12 thumb">
+<img id="wait-plot" class="img-responsive center-block plots" src="images/BL_wait_times.png"></img>
+
+</div>
+</div>
+
+<script type="text/javascript">
+function changeWait(element){
+var wait_link = element.getAttribute("src");
+document.getElementById("wait-plot").src = wait_link
+}
+</script>
+
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Estimating Wait Times</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: center;">
+							<img class="img-responsive center-block plots" src="images/wait_times.png"></img>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Additional Wait Times</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: center;">
+							<img class="img-responsive center-block plots" src="images/additional_waiting_time.png"></img>
+						</div>
+					</div>
+				</section>
+				<section class="other-slide">
+					<div class="header">
+						<h2>Thanks!</h2>
+						<div style="color: #2C3E50; padding: 20px; text-align: center;">
+							<img class="img-responsive center-block plots" src="santa transparent.gif"></img>
 						</div>
 					</div>
 				</section>
